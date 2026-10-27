@@ -9,9 +9,19 @@
         <a class="navbar-brand" href="/" style="font-weight: bold; text-decoration: none;">LazyArchiving</a>
         
         {#if isAuthenticated}
-            <a class="nav-link" href="/documents">Documents</a>
-            <a class="nav-link" href="/account">Account</a>
-        {/if}
+    <li class="nav-item">
+        <a class="nav-link" href="/documents">My Documents</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/account">Account</a>
+    </li>
+{/if}
+
+{#if isAuthenticated && user.user_roles && user.user_roles.includes("admin")}
+    <li class="nav-item">
+        <a class="nav-link" href="/admin">Admin Dashboard</a>
+    </li>
+{/if}
     </div>
 
     <div class="d-flex" style="display: flex; gap: 0.5rem; align-items: center;">

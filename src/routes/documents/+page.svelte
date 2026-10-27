@@ -5,9 +5,16 @@
   let { data, form } = $props();
 
   let documents = $derived(data.documents || []);
+  let { user, isAuthenticated } = $derived(data);
 </script>
 
 <h1 class="mt-3">Create Document</h1>
+
+{#if isAuthenticated && user.user_roles && user.user_roles.includes("admin")}
+    <div style="margin-bottom: 1rem;">
+        <a href="/documents/new" class="btn btn-success">+ New Document</a>
+    </div>
+{/if}
 
 {#if form?.success}
   <div class="alert alert-success alert-dismissible fade show" role="alert">
