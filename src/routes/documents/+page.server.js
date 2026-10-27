@@ -1,13 +1,21 @@
-// frontend/src/routes/documents/+page.server.js
 import axios from "axios";
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import { API_BASE_URL } from '$app/env/private';
 
-export async function load() {
+export async function load({ locals }) {
+    const jwt_token = locals.jwt_token;
+
+    if (!jwt_token) {
+        return {
+            documents: []
+        };
+    }
+
     try {
         const documentsResponse = await axios({
             method: "get",
             url: `${API_BASE_URL}/api/documents`,
+            headers: { Authorization: "Bearer " + jwt_token }
         });
 
         return {
@@ -20,34 +28,3 @@ export async function load() {
         };
     }
 }
-
-export const actions = {
-    createDocument: async ({ request }) => {
-        const data = await request.formData();
-        const doc = {
-            originalFilename: data.get('originalFilename'),
-            generatedTitle: data.get('generatedTitle'),
-            state: data.get('state')
-        };
-
-        try {
-            await axios({
-                method: "post",
-                url: `${API_BASE_URL}/api/documents`,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                data: doc,
-            });
-
-            return { success: true };
-        } catch (error) {
-            console.log('Error creating document:', error);
-
-            return fail(502, {
-                success: false,
-                error: 'Could not create document'
-            });
-        }
-    }
-};

@@ -1,12 +1,16 @@
-// frontend/src/routes/documents/new/+page.server.js
 import axios from "axios";
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { API_BASE_URL } from '$app/env/private';
 
 export const actions = {
-    createDocument: async ({ request }) => {
+    createDocument: async ({ request, locals }) => {
+        const jwt_token = locals.jwt_token;
+
+        if (!jwt_token) {
+            throw error(401, 'Authentication required');
+        }
+
         const data = await request.formData();
-        
         const document = {
             originalFilename: data.get('originalFilename'),
             state: data.get('state'),
@@ -20,6 +24,7 @@ export const actions = {
                 url: `${API_BASE_URL}/api/documents`,
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: "Bearer " + jwt_token
                 },
                 data: document,
             });
@@ -30,7 +35,6 @@ export const actions = {
             });
         }
 
-        // Nach erfolgreichem Speichern direkt zur Übersicht weiterleiten
         throw redirect(303, '/documents');
     }
 };
