@@ -1,0 +1,52 @@
+name: Deploy Frontend to Azure
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: lazyarchiving-frontend
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/lazyarchiving-frontend
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg API_BASE_URL=${{ secrets.API_BASE_URL }} \
+            --build-arg AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }} \
+            --build-arg AUTH0_CLIENT_ID=${{ secrets.AUTH0_CLIENT_ID }} \
+            --build-arg ORIGIN=${{ secrets.ORIGIN }} \
+            -t ${{ env.IMAGE_NAME }}:latest \
+            -t ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            .
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_FRONTEND }}
+          images: ${{ env.IMAGE_NAME }}:latest
