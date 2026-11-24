@@ -1,6 +1,6 @@
 import axios from "axios";
 import { error, fail, redirect } from '@sveltejs/kit';
-import { API_BASE_URL } from '$app/env/private';
+import { API_BASE_URL } from '$env/static/private';
 
 export const actions = {
     createDocument: async ({ request, locals }) => {

@@ -7,21 +7,14 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-# Copy source code and build
+# Copy source code
 COPY . .
 
-# Set build-time environment variables (passed from GitHub Actions)
-ARG API_BASE_URL
-ARG AUTH0_DOMAIN
-ARG AUTH0_CLIENT_ID
-ARG ORIGIN
+# Set build-time environment variables for public env vars
+ARG VITE_PUBLIC_AUTH0_CLIENT_ID
+ENV VITE_PUBLIC_AUTH0_CLIENT_ID=$VITE_PUBLIC_AUTH0_CLIENT_ID
 
-ENV API_BASE_URL=$API_BASE_URL
-ENV AUTH0_DOMAIN=$AUTH0_DOMAIN
-ENV AUTH0_CLIENT_ID=$AUTH0_CLIENT_ID
-ENV ORIGIN=$ORIGIN
-
-# Build SvelteKit app with adapter-node
+# Build SvelteKit app
 RUN npm run build
 
 # Stage 2: Runtime with Node.js
@@ -40,6 +33,12 @@ EXPOSE 3000
 # Set runtime environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
+
+# Private environment variables needed at runtime
+ARG API_BASE_URL
+ARG AUTH0_DOMAIN
+ENV API_BASE_URL=$API_BASE_URL
+ENV AUTH0_DOMAIN=$AUTH0_DOMAIN
 
 # Run application
 CMD ["node", "build"]
