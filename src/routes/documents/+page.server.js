@@ -1,6 +1,6 @@
 import axios from "axios";
 import { error, fail } from '@sveltejs/kit';
-import { API_BASE_URL } from '$env/static/private';
+import { API_BASE_URL } from '$app/env/private';
 
 export const actions = {
     assignToMe: async ({ request, locals }) => {

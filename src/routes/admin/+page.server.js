@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_BASE_URL } from '$env/static/private';
+import { API_BASE_URL } from '$app/env/private';
 
 export async function load({ locals }) {
     const jwt_token = locals.jwt_token;

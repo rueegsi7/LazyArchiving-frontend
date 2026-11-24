@@ -1,6 +1,7 @@
 import axios from "axios";
-import { AUTH0_DOMAIN } from '$env/static/private';
-import { VITE_PUBLIC_AUTH0_CLIENT_ID } from '$env/static/public';
+// Load environment variables from .env file for local development
+import { AUTH0_DOMAIN } from '$app/env/private';
+import { AUTH0_CLIENT_ID } from '$app/env/private';
 
 // Auth0 signup endpoint documentation: see https://auth0.com/docs/libraries/custom-signup#using-the-api
 async function signup(
@@ -14,7 +15,7 @@ async function signup(
     method: "post",
     url: `https://${AUTH0_DOMAIN}/dbconnections/signup`,
     data: {
-      client_id: VITE_PUBLIC_AUTH0_CLIENT_ID,
+      client_id: AUTH0_CLIENT_ID,
       email: email,
       password: password,
       connection: "Username-Password-Authentication",
@@ -61,7 +62,7 @@ async function login(username, password, cookies) {
       password: password,
       audience: `https://${AUTH0_DOMAIN}/api/v2/`,
       scope: "openid profile email",
-      client_id: VITE_PUBLIC_AUTH0_CLIENT_ID,
+      client_id: AUTH0_CLIENT_ID,
     },
   };
 
